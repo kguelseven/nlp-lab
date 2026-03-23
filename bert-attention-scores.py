@@ -12,35 +12,36 @@ attentions = outputs.attentions
 print("\n-- Struktur ---------------------")
 # 12 Layer (Transformer-Blöcke); 1 attention matrix pro Layer
 print(f"attentions length (=layers count): {len(attentions)}")
-# Dims: [batch_size, num_heads, seq_len, seq_len]: torch.Size([1, 12, 10, 10]
+# Dims: (batch_size, num_heads, seq_len, seq_len): torch.Size([1, 12, 7, 7]
 print(f"Layer 0 shape: {attentions[0].shape}")
 print(f"Layer 0, Batch 0 shape: {attentions[0][0].shape}")
 print(f"Layer 0, Batch 0, Head 0 shape: {attentions[0][0][0].shape}")
 print(f"Layer 0, Batch 0, Head 0, Token 1 Attention (auf alle 7 Tokens): {attentions[0][0][0][1].tolist()}")
 
-print("\n-- Attention Layer 1 und Last-----------------")
+print("\n-- Tokens -----------------")
 tokens = tokenizer.convert_ids_to_tokens(inputs['input_ids'][0])
-for driving, t in enumerate(tokens):
-    print(driving, t)
+for i, token in enumerate(tokens):
+    print(i, token)
 
 driving = 3 # driving
 paris = 5 # Paris
 print(f"Attention von '{tokens[driving]}' → '{tokens[paris]}': {attentions[0][0][0][driving][paris]}")
 
 print(f"\nAttention-Verteilung für Token im Layer 1 '{tokens[driving]}':")
-for paris, tok in enumerate(tokens):
-    score = attentions[0][0][0][driving][paris]
-    print(f"→ '{tok}': {score:.3f}")
+for i, token in enumerate(tokens):
+    score = attentions[0][0][0][driving][i]
+    print(f"→ '{token}': {score:.3f}")
 
 print(f"\nAttention-Verteilung für Token im letzten Layer '{tokens[driving]}':")
-for paris, tok in enumerate(tokens):
-    score = attentions[-1][0][0][driving][paris]
-    print(f"→ '{tok}': {score:.3f}")
+for i, token in enumerate(tokens):
+    score = attentions[-1][0][0][driving][i]
+    print(f"→ '{token}': {score:.3f}")
 
-print(f"\nAttention-Verteilung für Token im Layer 3 in Heads '{tokens[driving]}':")
+
+print(f"\nAttention-Verteilung für Token im Layer 3 in allen Heads '{tokens[driving]}':")
 layer = attentions[2][0]  # Layer 3, batch 0
 for head in range(layer.shape[0]):
-    distribution = layer[head][driving]  # Attention von Token i
+    distribution = layer[head][driving]  # Attention von Token driving
     max = distribution.argmax().item()
     print(f"Head {head + 1}: '{tokens[driving]}' max → '{tokens[max]}' ({distribution[max]:.3f})")
     for paris, score in enumerate(distribution):
